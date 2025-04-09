@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "whl2pyz"
-version = "0.0.1"
+version = "0.0.2"
 
 [project.scripts]
 whl2pyz = "whl2pyz:main"
