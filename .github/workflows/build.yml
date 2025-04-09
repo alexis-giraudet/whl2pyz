@@ -1,0 +1,25 @@
+name: Build Python Package
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+#      - uses: actions/setup-python@v5
+#        with:
+#          python-version: "3.x"
+      - name: Build release distributions
+        run: |
+          python3 -m pip install --upgrade build
+          python3 -m build
+          python3 -m pip install dist/*.whl
+          whl2pyz --output dist/ --python "/usr/bin/env python3" --compress dist/*.whl
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
