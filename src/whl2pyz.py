@@ -1,10 +1,12 @@
 import argparse
+import configparser
 from pathlib import Path
 import shutil
 import subprocess
 import sys
 import tempfile
 import zipapp
+import zipfile
 
 
 def main(args=None):
@@ -38,12 +40,23 @@ def main(args=None):
 
         args.output.mkdir(parents=True, exist_ok=True)
 
-        # TODO Filter entry points using *.whl/*.dist-info/entry_points.txt
+        entry_points = set()
+        with zipfile.ZipFile(args.wheel) as wheel_zip:
+            for dist_info_dir in zipfile.Path(wheel_zip).iterdir():
+                if dist_info_dir.is_dir() and dist_info_dir.name.endswith(".dist-info"):
+                    entry_points_txt = dist_info_dir.joinpath("entry_points.txt")
+                    if entry_points_txt.is_file():
+                        entry_points_config = configparser.ConfigParser()
+                        entry_points_config.read_string(entry_points_txt.read_text())
+                        for section in ["console_scripts", "gui_scripts"]:
+                            if entry_points_config.has_section(section):
+                                entry_points.update(entry_points_config.options(section))
+                    break
 
         bin_dir = Path(target_dir, "bin")
         if bin_dir.is_dir():
             for entrypoint_file in bin_dir.iterdir():
-                if entrypoint_file.is_file():
+                if entrypoint_file.is_file() and entrypoint_file.name in entry_points:
                     shutil.copy(entrypoint_file, Path(target_dir, "__main__.py"))
                     zipapp.create_archive(
                         target_dir,
