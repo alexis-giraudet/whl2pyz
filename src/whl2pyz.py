@@ -16,10 +16,10 @@ def main(args=None):
     parser.add_argument("wheel", help="")
     parser.add_argument(
         "-o",
-        "--output",
+        "--outdir",
         type=Path,
-        default=Path(),
-        help="The output directory where Python executable zip archives are generated.",
+        default=Path("bin"),
+        help="The output directory where Python executable zip archives are generated (default is ./bin).",
     )
     parser.add_argument(
         "-p",
@@ -38,7 +38,7 @@ def main(args=None):
     with tempfile.TemporaryDirectory() as target_dir:
         subprocess.run([sys.executable, "-m", "pip", "install", "--target", target_dir, args.wheel], check=True)
 
-        args.output.mkdir(parents=True, exist_ok=True)
+        args.outdir.mkdir(parents=True, exist_ok=True)
 
         entry_points = set()
         with zipfile.ZipFile(args.wheel) as wheel_zip:
@@ -60,7 +60,7 @@ def main(args=None):
                     shutil.copy(entrypoint_file, Path(target_dir, "__main__.py"))
                     zipapp.create_archive(
                         target_dir,
-                        target=args.output.joinpath(entrypoint_file.name + ".pyz"),
+                        target=args.outdir.joinpath(entrypoint_file.name + ".pyz"),
                         interpreter=args.python,
                         compressed=args.compress,
                     )
