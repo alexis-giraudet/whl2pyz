@@ -56,6 +56,7 @@ jobs:
           name: dist
           path: ${{ runner.temp }}/dist/
       - name: Debug
+        if: always()
         run: |
           sudo apt --yes install tree
           tree "${{ runner.temp }}"
@@ -64,6 +65,7 @@ jobs:
         with:
           packages-dir: ${{ runner.temp }}/dist/
       - name: Debug
+        if: always()
         run: |
           sudo apt --yes install tree
           tree "${{ runner.temp }}"
