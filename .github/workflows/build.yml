@@ -15,16 +15,16 @@ jobs:
       - name: Build release distributions
         run: |
           python3 -m pip install --upgrade build
-          python3 -m build
-          python3 -m pip install dist/*.whl
-          whl2pyz --python "/usr/bin/env python3" --compress dist/*.whl
-      - name: Upload dis artifact
+          python3 -m build --outdir "${{ runner.temp }}/dist"
+          python3 -m pip install "${{ runner.temp }}/dist/"*.whl
+          whl2pyz --outdir "${{ runner.temp }}/bin" --python "/usr/bin/env python3" --compress dist/*.whl
+      - name: Upload dist artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: dist/
+          path: ${{ runner.temp }}/dist/
       - name: Upload bin artifact
         uses: actions/upload-artifact@v4
         with:
           name: bin
-          path: bin/
+          path: ${{ runner.temp }}/bin/

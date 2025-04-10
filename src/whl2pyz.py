@@ -13,13 +13,13 @@ def main(args=None):
     parser = argparse.ArgumentParser(
         description="Generate Python executable zip archive for each entry point from a wheel package."
     )
-    parser.add_argument("wheel", help="")
+    parser.add_argument("wheel", help="The input wheel file (.whl).")
     parser.add_argument(
         "-o",
         "--outdir",
         type=Path,
         default=Path("bin"),
-        help="The output directory where Python executable zip archives are generated (default is ./bin).",
+        help="The output directory where Python executable zip archives (.pyz) are generated (default is ./bin).",
     )
     parser.add_argument(
         "-p",

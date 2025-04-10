@@ -4,7 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "whl2pyz"
-version = "0.0.2"
+description = "Generate Python executable zip archive for each entry point from a wheel package."
+version = "0.0.3"
+authors = [{name = "Alexis Giraudet"}]
+readme = "README.md"
+license = "GPL-3.0-or-later"
+keywords = ["whl", "wheel", "pyz", "zipapp"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Build Tools",
+  "Topic :: System :: Archiving :: Packaging",
+  "Programming Language :: Python :: 3"
+]
+
+[project.urls]
+Repository = "https://github.com/alexis-giraudet/whl2pyz.git"
 
 [project.scripts]
 whl2pyz = "whl2pyz:main"
