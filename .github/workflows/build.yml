@@ -17,7 +17,7 @@ jobs:
           python3 -m pip install --upgrade build
           python3 -m build --outdir "${{ runner.temp }}/dist"
           python3 -m pip install "${{ runner.temp }}/dist/"*.whl
-          whl2pyz --outdir "${{ runner.temp }}/bin" --python "/usr/bin/env python3" --compress dist/*.whl
+          whl2pyz --outdir "${{ runner.temp }}/bin" --python "/usr/bin/env python3" --compress "${{ runner.temp }}/dist/"*.whl
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
         with:
