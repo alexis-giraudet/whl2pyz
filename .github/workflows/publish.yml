@@ -55,6 +55,10 @@ jobs:
         with:
           name: dist
           path: ${{ runner.temp }}/dist/
+      - name: Debug
+        run: |
+          sudo apt --yes install tree
+          tree "${{ runner.temp }}"
       - name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
