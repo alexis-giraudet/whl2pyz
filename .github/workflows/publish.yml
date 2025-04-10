@@ -63,3 +63,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: ${{ runner.temp }}/dist/
+      - name: Debug
+        run: |
+          sudo apt --yes install tree
+          tree "${{ runner.temp }}"
