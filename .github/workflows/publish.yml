@@ -54,8 +54,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dist
-          path: ${{ runner.temp }}/dist/
+          path: dist/
       - name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: ${{ runner.temp }}/dist/
+          packages-dir: dist/
