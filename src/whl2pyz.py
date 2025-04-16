@@ -11,9 +11,11 @@ import zipfile
 
 def main(args=None):
     parser = argparse.ArgumentParser(
-        description="Generate Python executable zip archive for each entry point from a wheel package."
+        description="Generate Python executable zip archive for each entry point from wheel packages."
     )
-    parser.add_argument("wheel", help="The input wheel file (.whl).")
+    parser.add_argument(
+        "-w", "--wheels", nargs="+", required=True, help="The input wheel files (.whl)."
+    )
     parser.add_argument(
         "-o",
         "--outdir",
@@ -32,26 +34,50 @@ def main(args=None):
         action="store_true",
         help="Compress files with the deflate method. Files are stored uncompressed by default.",
     )
+    parser.add_argument(
+        "pip_args",
+        nargs="*",
+        help="Extra pip install arguments.",
+    )
 
     args = parser.parse_args(args)
 
     with tempfile.TemporaryDirectory() as target_dir:
-        subprocess.run([sys.executable, "-m", "pip", "install", "--target", target_dir, args.wheel], check=True)
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pip",
+                "install",
+                "--target",
+                target_dir,
+            ]
+            + args.pip_args
+            + args.wheels,
+            check=True,
+        )
 
         args.outdir.mkdir(parents=True, exist_ok=True)
 
         entry_points = set()
-        with zipfile.ZipFile(args.wheel) as wheel_zip:
-            for dist_info_dir in zipfile.Path(wheel_zip).iterdir():
-                if dist_info_dir.is_dir() and dist_info_dir.name.endswith(".dist-info"):
-                    entry_points_txt = dist_info_dir.joinpath("entry_points.txt")
-                    if entry_points_txt.is_file():
-                        entry_points_config = configparser.ConfigParser()
-                        entry_points_config.read_string(entry_points_txt.read_text())
-                        for section in ["console_scripts", "gui_scripts"]:
-                            if entry_points_config.has_section(section):
-                                entry_points.update(entry_points_config.options(section))
-                    break
+        for wheel in args.wheels:
+            with zipfile.ZipFile(wheel) as wheel_zip:
+                for dist_info_dir in zipfile.Path(wheel_zip).iterdir():
+                    if dist_info_dir.is_dir() and dist_info_dir.name.endswith(
+                        ".dist-info"
+                    ):
+                        entry_points_txt = dist_info_dir.joinpath("entry_points.txt")
+                        if entry_points_txt.is_file():
+                            entry_points_config = configparser.ConfigParser()
+                            entry_points_config.read_string(
+                                entry_points_txt.read_text()
+                            )
+                            for section in ["console_scripts", "gui_scripts"]:
+                                if entry_points_config.has_section(section):
+                                    entry_points.update(
+                                        entry_points_config.options(section)
+                                    )
+                        break
 
         bin_dir = Path(target_dir, "bin")
         if bin_dir.is_dir():
