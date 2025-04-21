@@ -1,6 +1,6 @@
 import argparse
 import configparser
-from pathlib import Path
+import pathlib
 import shutil
 import subprocess
 import sys
@@ -9,18 +9,40 @@ import zipapp
 import zipfile
 
 
+MAIN_TEMPLATE = """\
+# -*- coding: utf-8 -*-
+import pathlib
+import runpy
+import shutil
+import tempfile
+import zipfile
+
+with zipfile.ZipFile(pathlib.Path(__file__).parent) as zip:
+    with tempfile.TemporaryDirectory() as tmp:
+        zip.extractall(tmp)
+        shutil.copyfile(
+            pathlib.Path(tmp, "{entrypoint}"), pathlib.Path(tmp, "__main__.py")
+        )
+        runpy.run_path(tmp, run_name="__main__")
+"""
+
+
 def main(args=None):
     parser = argparse.ArgumentParser(
-        description="Generate Python executable zip archive for each entry point from wheel packages."
+        description="Generate Python executable zip archive for each entry point from wheel packages (requires pip module)."
     )
     parser.add_argument(
-        "-w", "--wheels", nargs="+", required=True, help="The input wheel files (.whl)."
+        "-w",
+        "--wheels",
+        nargs="*",
+        default=[],
+        help="Install given wheels package to the Python executable zip archive and use only entry points from [WHEEL].dist-info/entry_points.txt.",
     )
     parser.add_argument(
         "-o",
         "--outdir",
-        type=Path,
-        default=Path("bin"),
+        type=pathlib.Path,
+        default=pathlib.Path("bin"),
         help="The output directory where Python executable zip archives (.pyz) are generated (default is ./bin).",
     )
     parser.add_argument(
@@ -33,6 +55,12 @@ def main(args=None):
         "--compress",
         action="store_true",
         help="Compress files with the deflate method. Files are stored uncompressed by default.",
+    )
+    parser.add_argument(
+        "-b",
+        "--binaries",
+        action="store_true",
+        help="The Python executable zip archive will be extracted into a temporary directory and run on the file system to allow execution of binary packages including a C extension.",
     )
     parser.add_argument(
         "pip_args",
@@ -79,11 +107,22 @@ def main(args=None):
                                     )
                         break
 
-        bin_dir = Path(target_dir, "bin")
+        bin_dir = pathlib.Path(target_dir, "bin")
         if bin_dir.is_dir():
             for entrypoint_file in bin_dir.iterdir():
-                if entrypoint_file.is_file() and entrypoint_file.name in entry_points:
-                    shutil.copy(entrypoint_file, Path(target_dir, "__main__.py"))
+                if entrypoint_file.is_file() and (
+                    entrypoint_file.name in entry_points or not args.wheels
+                ):
+                    main_path = pathlib.Path(target_dir, "__main__.py")
+                    if args.binaries:
+                        with open(main_path, "w", encoding="utf-8") as main_file:
+                            main_file.write(
+                                MAIN_TEMPLATE.format(
+                                    entrypoint=entrypoint_file.relative_to(target_dir)
+                                )
+                            )
+                    else:
+                        shutil.copyfile(entrypoint_file, main_path)
                     zipapp.create_archive(
                         target_dir,
                         target=args.outdir.joinpath(entrypoint_file.name + ".pyz"),
