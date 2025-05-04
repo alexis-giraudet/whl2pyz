@@ -32,7 +32,7 @@ options:
                         extension.
 ```
 
-Packaging [nvitop](https://pypi.org/project/nvitop/) in zip app:
+Packaging [nvitop](https://pypi.org/project/nvitop/) in a zip app:
 ```sh
 $ whl2pyz -x -p "/usr/bin/env python3" -- nvitop
 ...
@@ -40,7 +40,7 @@ $ ./bin/nvitop.pyz
 ...
 ```
 
-Packaging standalone (no backend) [PyVISA](https://pypi.org/project/PyVISA/) in zip app:
+Packaging standalone (no backend) [PyVISA](https://pypi.org/project/PyVISA/) in a portable zip app:
 ```sh
 $ whl2pyz -p "/usr/bin/env python3" -- pyvisa
 ...
@@ -68,7 +68,7 @@ $ ./bin/pyvisa-shell.pyz
 ...
 ```
 
-Packaging [PyVISA](https://pypi.org/project/PyVISA/) with [PyVISA-py](https://pypi.org/project/PyVISA-py/) backend in zip app:
+Packaging [PyVISA](https://pypi.org/project/PyVISA/) with [PyVISA-py](https://pypi.org/project/PyVISA-py/) backend in a portable zip app:
 ```sh
 $ whl2pyz -p "/usr/bin/env python3" -- pyvisa pyvisa-py
 ...
@@ -122,7 +122,7 @@ $ ./bin/pyvisa-shell.pyz
 ...
 ```
 
-Packaging [PyVISA](https://pypi.org/project/PyVISA/) with [PyVISA-py](https://pypi.org/project/PyVISA-py/) backend including optional dependencies in zip app:
+Packaging [PyVISA](https://pypi.org/project/PyVISA/) with [PyVISA-py](https://pypi.org/project/PyVISA-py/) backend including optional dependencies in a zip app:
 ```sh
 $ whl2pyz -x -p "/usr/bin/env python3" -- pyvisa pyvisa-py[serial,usb,psutil,hislip-discovery]
 ...
