@@ -114,7 +114,7 @@ def main(args=None):
                     entrypoint_file.name in entry_points or not args.wheels
                 ):
                     main_path = pathlib.Path(target_dir, "__main__.py")
-                    if args.binaries:
+                    if args.auto_extract:
                         with open(main_path, "w", encoding="utf-8") as main_file:
                             main_file.write(
                                 MAIN_TEMPLATE.format(
