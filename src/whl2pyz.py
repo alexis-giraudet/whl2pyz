@@ -36,7 +36,7 @@ def main(args=None):
         "--wheels",
         nargs="*",
         default=[],
-        help="Install given wheels package to the Python executable zip archive and use only entry points from [WHEEL].dist-info/entry_points.txt.",
+        help="Install given wheels to the Python executable zip archive and use only entry points from [WHEEL].dist-info/entry_points.txt.",
     )
     parser.add_argument(
         "-o",
@@ -57,8 +57,8 @@ def main(args=None):
         help="Compress files with the deflate method. Files are stored uncompressed by default.",
     )
     parser.add_argument(
-        "-b",
-        "--binaries",
+        "-x",
+        "--auto-extract",
         action="store_true",
         help="The Python executable zip archive will be extracted into a temporary directory and run on the file system to allow execution of binary packages including a C extension.",
     )
