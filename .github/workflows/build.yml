@@ -14,7 +14,7 @@ jobs:
 #          python-version: "3.x"
       - name: Build release distributions
         run: |
-          python3 -m pip install --upgrade build
+          python3 -m pip install --upgrade pip build
           python3 -m build --outdir "${{ runner.temp }}/dist"
           python3 -m pip install "${{ runner.temp }}/dist/"*.whl
           whl2pyz --outdir "${{ runner.temp }}/bin" --python "/usr/bin/env python3" --compress "${{ runner.temp }}/dist/"*.whl
